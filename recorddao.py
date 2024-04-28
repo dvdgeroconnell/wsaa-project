@@ -1,9 +1,11 @@
 # recorddao.py
 #
-# DAO file to implement the CRUD methods
+# DAO file to implement the CRUD methods on the records database
 #
 # Author: David O'Connell
 #
+
+
 
 # return all LP records in the database table
 def get_all():
