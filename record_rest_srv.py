@@ -1,12 +1,12 @@
 # record_rest_srv.py
 #
 # Create a basic rest server.
+# See README for curl commands to test.
 #
 # David O'Connell
 
-from flask import Flask, url_for, request, redirect, abort
-
-import mysql
+from flask import Flask, jsonify, url_for, request, redirect, abort
+from recordDAOframework import recordDAO
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
@@ -16,43 +16,75 @@ def index():
 
 # Get all records
 @app.route('/records', methods=['GET'])
-def getall():
-    return "get all"
+def get_all():
+    # Get the response object
+    return jsonify(recordDAO.get_all_records())
 
 # Get record by ID
 @app.route('/records/<int:id>', methods=['GET'])
-def findbyid(id):
-    return "find by id"
+def find_by_id(id):
+    # Get the response object
+    return jsonify(recordDAO.find_record_by_id(id))
 
 # Create a record
 @app.route('/records', methods=['POST'])
+
 def create():
-    # read json from the body
+    # Read the JSON from the body of the incoming request
+    record = {}
     record_string = request.json
-    return f"create {record_string}"
+    
+    # build the record to create - check each field is present
+    if "title" not in record_string:
+        abort(403)
+    record["title"] = record_string["title"]
+
+    if "artist" not in record_string:
+        abort(403)
+    record["artist"] = record_string["artist"]
+
+    if "year" not in record_string:
+        abort(403)
+    record["year"] = record_string["year"]
+
+    if "genre" not in record_string:
+        abort(403)
+    record["genre"] = record_string["genre"]
+
+    # Create the record, get the response object
+    print(record)
+    return jsonify(recordDAO.create_record(record))
+
 
 # Update a record
 @app.route('/records/<int:id>', methods=['PUT'])
+
 def update(id):
+    # Read the JSON from the body of the incoming request
+    record = {}
     record_string = request.json
-    return f"update {id} {record_string}"
+
+    # Build the update
+    if "title" in record_string:
+        record["title"] = record_string["title"]
+    if "artist" in record_string:
+        record["artist"] = record_string["artist"]
+    if "year" in record_string:
+        record["year"] = record_string["year"]
+    if "genre" in record_string:
+        record["genre"] = record_string["genre"]
+
+    # Update the record, get the response object
+    print(record)
+    return jsonify(recordDAO.update_record(id, record))
+
 
 # Delete a record
-@app.route('/books/<int:id>', methods=['DELETE'])
+@app.route('/records/<int:id>', methods=['DELETE'])
+
 def delete(id):
-    return f"delete {id}"
+    # Delete the record, get the response object
+    return jsonify(recordDAO.delete_record(id))
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-# CURL commands to test
-# Get All
-# curl http://127.0.0.1:5000/records
-# find by ID
-# curl http://127.0.0.1:5000/records/1
-# Create
-# curl -X POST -H "Content-Type: application/json" -d "{\"title\":\"Closer\", \"artist\":\"Joy Division\", \"price\":699}" http://127.0.0.1:5000/records
-# Update
-# curl -X PUT -H "Content-Type: application/json" -d "{\"title\":\"Closer\", \"artist\":\"Joy Division\", \"price\":1099}" http://127.0.0.1:5000/records/1
-# Delete
-# curl -X DELETE http://127.0.0.1:5000/records/1
