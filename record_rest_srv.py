@@ -6,6 +6,8 @@
 
 from flask import Flask, url_for, request, redirect, abort
 
+import mysql
+
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
 @app.route('/')
