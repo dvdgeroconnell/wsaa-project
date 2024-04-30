@@ -6,7 +6,8 @@
 # David O'Connell
 
 from flask import Flask, jsonify, url_for, request, redirect, abort
-from recordDAOframework import recordDAO
+#from recordDAOframework import recordDAO
+from recordDAO import recordDAO
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
@@ -36,23 +37,23 @@ def create():
     
     # build the record to create - check each field is present
     if "title" not in record_string:
-        abort(403)
+        abort(400)
     record["title"] = record_string["title"]
 
     if "artist" not in record_string:
-        abort(403)
+        abort(400)
     record["artist"] = record_string["artist"]
 
     if "year" not in record_string:
-        abort(403)
+        abort(400)
     record["year"] = record_string["year"]
 
     if "genre" not in record_string:
-        abort(403)
+        abort(400)
     record["genre"] = record_string["genre"]
 
     # Create the record, get the response object
-    print(record)
+    print("Creating", record)
     return jsonify(recordDAO.create_record(record))
 
 
@@ -75,7 +76,7 @@ def update(id):
         record["genre"] = record_string["genre"]
 
     # Update the record, get the response object
-    print(record)
+    print("Updating record", id, "to", record)
     return jsonify(recordDAO.update_record(id, record))
 
 
