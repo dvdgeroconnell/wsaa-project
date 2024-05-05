@@ -1,10 +1,16 @@
 # recordDAOframework.py
 #
-# Create a DAO framework for development and test purposes.
-# This will provide the REST server with a set of stubs to interact with.
-#
+# This file implements the Data Access Object used by record_rest_srv.py
+# for all operations. It implements the following:
+# 1) Get all records
+# 2) Get one record by ID
+# 3) Create a record
+# 4) Update a record
+# 5) Delete a record
+# 
 # David O'Connell
 #
+#------------------------------------------------------------------------
 
 import mysql.connector
 from mysql.connector import cursor
@@ -19,11 +25,15 @@ class RecordDAO:
     password =   ''
     database =   ''
 
+#------------------------------------------------------------------------
+
     def __init__(self):
-        self.host=cfg.mysqldb['host']
-        self.user=cfg.mysqldb['user']
-        self.password=cfg.mysqldb['password']
-        self.database=cfg.mysqldb['database']
+        self.host     = cfg.mysqldb['host']
+        self.user     = cfg.mysqldb['user']
+        self.password = cfg.mysqldb['password']
+        self.database = cfg.mysqldb['database']
+
+#------------------------------------------------------------------------
 
     def get_cursor(self): 
         self.connection = mysql.connector.connect(
@@ -34,31 +44,38 @@ class RecordDAO:
         )
         self.cursor = self.connection.cursor()
         return self.cursor
-    
+
+#------------------------------------------------------------------------
+# Close the connection and cursor, free up resources
+
     def close_all(self):
         self.connection.close()
         self.cursor.close()
-    
+#------------------------------------------------------------------------
+
     # Get all records         
     def get_all_records(self):    
         cursor = self.get_cursor()
         sql_string="select * from records"
         cursor.execute(sql_string)
+
+        # results will be a list of database records, each is a list of
+        # the fields - so it is a list of lists
         results = cursor.fetchall()
+        print(results)
+
         # returnArray = []
-        for result in results:
-            # This is temporary
-            pass
+        #for result in results:
             # print(result)
             # Taking out the convert to dictionary for now
             # returnArray.append(self.convertToDictionary(result))
 
         self.close_all()
-        # return returnArray
         return(results)
 
-    
-    # Find a record by ID
+#------------------------------------------------------------------------
+# Find a record by ID
+
     def find_record_by_id(self, id):
         cursor = self.get_cursor()
         print("retrieving record id =", id)
@@ -68,26 +85,26 @@ class RecordDAO:
         result = cursor.fetchone()
         #returnvalue = self.convertToDictionary(result)
         self.close_all()
-        # return returnvalue
         return result
         
+#------------------------------------------------------------------------
+# Create a record
 
-    # Create a record
     def create_record(self, record):
 
         cursor = self.get_cursor()
         sql_string="insert into records (title, artist, year, genre) values (%s,%s,%s,%s)"
         values = (record.get("title"), record.get("artist"), record.get("year"), record.get("genre"))
         cursor.execute(sql_string, values)
-
         self.connection.commit()
         new_id = cursor.lastrowid
         record["id"] = new_id
         self.close_all()
         return record
 
-
+#------------------------------------------------------------------------
     # Update a record with an ID of 'id'
+
     def update_record(self, id, record):
         cursor = self.get_cursor()
         sql_string="update records set title= %s,artist=%s, year=%s, genre=%s where id = %s"
@@ -97,9 +114,10 @@ class RecordDAO:
         self.connection.commit()
         self.close_all()
         return(record)
-    
 
-    # Delete a record with an ID of 'id'  
+#------------------------------------------------------------------------
+# Delete a record with an ID of 'id'  
+
     def delete_record(self, id):
         cursor = self.get_cursor()
         sql_string="delete from records where id = %s"
@@ -111,7 +129,9 @@ class RecordDAO:
 
         return True
 
-# Create an instance of the class   
+#------------------------------------------------------------------------
+# Create an instance of the class 
+  
 recordDAO = RecordDAO()
 
 # Define a set of tests to execute if this module is run as main 
