@@ -11,23 +11,32 @@ from recordDAO import recordDAO
 
 app = Flask(__name__, static_url_path='', static_folder='staticpages')
 
+#------------------------------------------------------------------------
+# Index
+
 @app.route('/')
 def index():
     return "hello"
 
+#------------------------------------------------------------------------
 # Get all records
+
 @app.route('/records', methods=['GET'])
 def get_all():
     # Get the response object
     return jsonify(recordDAO.get_all_records())
 
+#------------------------------------------------------------------------
 # Get record by ID
+
 @app.route('/records/<int:id>', methods=['GET'])
 def find_by_id(id):
     # Get the response object
     return jsonify(recordDAO.find_record_by_id(id))
 
+#------------------------------------------------------------------------
 # Create a record
+
 @app.route('/records', methods=['POST'])
 
 def create():
@@ -56,8 +65,9 @@ def create():
     print("Creating", record)
     return jsonify(recordDAO.create_record(record))
 
-
+#------------------------------------------------------------------------
 # Update a record
+
 @app.route('/records/<int:id>', methods=['PUT'])
 
 def update(id):
@@ -79,8 +89,9 @@ def update(id):
     print("Updating record", id, "to", record)
     return jsonify(recordDAO.update_record(id, record))
 
-
+#------------------------------------------------------------------------
 # Delete a record
+
 @app.route('/records/<int:id>', methods=['DELETE'])
 
 def delete(id):
