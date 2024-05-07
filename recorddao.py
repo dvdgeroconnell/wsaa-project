@@ -64,14 +64,14 @@ class RecordDAO:
         results = cursor.fetchall()
         print(results)
 
-        # returnArray = []
-        #for result in results:
-            # print(result)
-            # Taking out the convert to dictionary for now
-            # returnArray.append(self.convertToDictionary(result))
+        returnArray = []
+        for result in results:
+            print(result)
+            returnArray.append(self.convert_to_dict(result))
 
         self.close_all()
-        return(results)
+        return returnArray
+        #return(results)
 
 #------------------------------------------------------------------------
 # Find a record by ID
@@ -83,9 +83,10 @@ class RecordDAO:
         values = (id,)
         cursor.execute(sql_string, values)
         result = cursor.fetchone()
-        #returnvalue = self.convertToDictionary(result)
+        returnvalue = self.convert_to_dict(result)
         self.close_all()
-        return result
+        return returnvalue
+        #return result
         
 #------------------------------------------------------------------------
 # Create a record
@@ -130,8 +131,19 @@ class RecordDAO:
         return True
 
 #------------------------------------------------------------------------
+
+    def convert_to_dict(self, result_line):
+        attkeys=['id','title','artist', "year", "genre"]
+        record = {}
+        currentkey=0
+        for attrib in result_line:
+            record[attkeys[currentkey]] = attrib
+            currentkey+=1 
+        return record
+
+#------------------------------------------------------------------------
 # Create an instance of the class 
-  
+
 recordDAO = RecordDAO()
 
 # Define a set of tests to execute if this module is run as main 
