@@ -97,7 +97,6 @@ def create():
         abort(400)
     record["year"] = record_string["year"]
 
-
     if "genre" not in record_string:
         abort(400)
     record["genre"] = record_string["genre"]

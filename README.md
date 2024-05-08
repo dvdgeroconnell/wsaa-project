@@ -12,6 +12,21 @@ DAO framework with a set of stubs for development and test purposes.
 #### README.md
 This file.
 
+### Latest working versions of files
+
+#### in WSAA-project
+- recordDAO.py - the database DAO.
+- record_rest_srv_cors.py - the flask app server with CORS changes. Also reinstated the convert to dict code.
+- recordviewer3.html - equivalent of lab0602 (Javascript). Replaces recordviewer.html.
+- testGetAll2.html - working copy.
+#### in WSAA-coursework
+- testGetAll.html - equivalent of lab0603 (Ajax). Known good working copy. Moved wip version to WSAA-project.
+
+### Older retained files
+- recordviewer.html - original version of the html / Javascript file
+- recordviewer2.html - updated, known good working copy with HTML and Javascript
+- record_rest_srv.py - before CORS and other changes.
+
 
 ## API Definition
 The parameters are:
