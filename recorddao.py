@@ -12,8 +12,11 @@
 #
 #------------------------------------------------------------------------
 
-import mysql.connector
+import mysql.connector as mc
 from mysql.connector import cursor
+from mysql.connector.errors import Error
+import sys
+
 import mysqldbcfg as cfg
 
 # Create the class
@@ -24,7 +27,7 @@ class RecordDAO:
     user =       ''
     password =   ''
     database =   ''
-
+    
 #------------------------------------------------------------------------
 
     def __init__(self):
@@ -36,7 +39,7 @@ class RecordDAO:
 #------------------------------------------------------------------------
 
     def get_cursor(self): 
-        self.connection = mysql.connector.connect(
+        self.connection = mc.connect(
             host=       self.host,
             user=       self.user,
             password=   self.password,
@@ -44,6 +47,62 @@ class RecordDAO:
         )
         self.cursor = self.connection.cursor()
         return self.cursor
+
+#------------------------------------------------------------------------
+# Check if the database from the configuration file exists
+
+    def db_check(self):
+        exists = False
+        try:
+            print("Looking for",cfg.mysqldb['database'])
+            # this will not return a cursor if the database doesn't exist and an exception will be thrown
+            cursor = self.get_cursor()
+            if cursor:
+                exists = True
+        except Error as e:
+            if e.errno == 1049:
+                print("Error: Database does not exist, creating database",cfg.mysqldb['database'])
+                cnx = mc.connect(host=self.host,user=self.user,password=self.password)
+                cursor1 = cnx.cursor()
+                sql = "create database {}".format(self.database)
+                cursor1.execute(sql)
+
+            elif e.errno == -1:
+                print("Error: Check credentials in the database config file")
+                print("Exiting...")
+                sys.exit(0)
+            else:
+                print("Error:",e, "Number:",e.errno)
+                print("Exiting...")
+                sys.exit(0)
+        return exists
+
+#------------------------------------------------------------------------
+# Create the table exists - if not, create it
+
+    def table_check(self):
+        exists = False
+        print("in table check")
+        try:
+            cursor = self.get_cursor()
+            sql_string="show tables"
+            cursor.execute(sql_string)
+            dbtables = cursor.fetchall()
+            print("looking for",TABLE_NAME)
+            for dbtable in dbtables:
+                if dbtable[0] == TABLE_NAME:
+                    exists = True
+            if not exists:
+                # table doesn't exist, create it
+                cursor1 = self.get_cursor()
+                sql_string1="create table {} (id int AUTO_INCREMENT PRIMARY KEY, title varchar(250), artist varchar(250), year int, genre varchar(250))".format(TABLE_NAME)
+                cursor1.execute(sql_string1)
+               
+        except Error as e:
+            print("Error:",e, "Number:",e.errno)
+            sys.exit(0)
+
+        return exists
 
 #------------------------------------------------------------------------
 # Close the connection and cursor, free up resources
@@ -56,22 +115,19 @@ class RecordDAO:
     # Get all records         
     def get_all_records(self):    
         cursor = self.get_cursor()
-        sql_string="select * from records"
+        sql_string="select * from {}".format(TABLE_NAME)
         cursor.execute(sql_string)
 
         # results will be a list of database records, each is a list of
         # the fields - so it is a list of lists
         results = cursor.fetchall()
-        print(results)
-
-        returnArray = []
+        record_array = []
         for result in results:
-            print(result)
-            returnArray.append(self.convert_to_dict(result))
+            #print(result)
+            record_array.append(self.convert_to_dict(result))
 
         self.close_all()
-        return returnArray
-        #return(results)
+        return record_array
 
 #------------------------------------------------------------------------
 # Find a record by ID
@@ -79,7 +135,7 @@ class RecordDAO:
     def find_record_by_id(self, id):
         cursor = self.get_cursor()
         print("retrieving record id =", id)
-        sql_string="select * from records where id = %s"
+        sql_string="select * from {} where id = %s".format(TABLE_NAME)
         values = (id,)
         cursor.execute(sql_string, values)
         result = cursor.fetchone()
@@ -94,7 +150,7 @@ class RecordDAO:
     def create_record(self, record):
 
         cursor = self.get_cursor()
-        sql_string="insert into records (title, artist, year, genre) values (%s,%s,%s,%s)"
+        sql_string="insert into {} (title, artist, year, genre) values (%s,%s,%s,%s)".format(TABLE_NAME)
         values = (record.get("title"), record.get("artist"), record.get("year"), record.get("genre"))
         cursor.execute(sql_string, values)
         self.connection.commit()
@@ -108,7 +164,7 @@ class RecordDAO:
 
     def update_record(self, id, record):
         cursor = self.get_cursor()
-        sql_string="update records set title= %s,artist=%s, year=%s, genre=%s where id = %s"
+        sql_string="update {} set title= %s,artist=%s, year=%s, genre=%s where id = %s".format(TABLE_NAME)
         print(type(record))
         values = (record.get("title"), record.get("artist"), record.get("year"), record.get("genre"),id)
         cursor.execute(sql_string, values)
@@ -121,7 +177,7 @@ class RecordDAO:
 
     def delete_record(self, id):
         cursor = self.get_cursor()
-        sql_string="delete from records where id = %s"
+        sql_string="delete from {} where id = %s".format(TABLE_NAME)
         values = (id,)
         cursor.execute(sql_string, values)
         self.connection.commit()
@@ -145,6 +201,23 @@ class RecordDAO:
 # Create an instance of the class 
 
 recordDAO = RecordDAO()
+TABLE_NAME = 'records'
+
+# Do some initialization here
+
+# Check if database exists.
+recordDAO.db_check()
+
+# check table exists
+recordDAO.table_check()
+
+# add a couple of starter records if the table is empty
+record = {"title":"London Calling","artist":"The Clash","year":1979,"genre":"Punk"}
+record2 = {"title":"Foxtrot","artist":"Genesis","year":1973,"genre":"Rock"}
+results = recordDAO.get_all_records()
+if not results:
+    recordDAO.create_record(record)
+    recordDAO.create_record(record2)
 
 # Define a set of tests to execute if this module is run as main 
 if __name__ == "__main__":
