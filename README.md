@@ -103,3 +103,7 @@ curl -X DELETE http://127.0.0.1:5000/records/5
 
 ## References
 https://dev.mysql.com/doc/connector-python/en/connector-python-example-ddl.html
+https://www.html.am/html-tutorial/
+https://www.w3schools.com/jsref/default.asp
+
+
