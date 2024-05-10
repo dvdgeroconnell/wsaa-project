@@ -1,5 +1,5 @@
-# wsaa-project README
-README for the WSAA CY24 final project.  
+# WSAA Final Project - README
+README for the WSAA CY24 final project (repository - wsaa_project).  
 
 | Topic | Details |
 |---------|-------------|
@@ -106,7 +106,7 @@ The API will implement the following operations:
 CURL or Postman may be used to test the server-side functionality.
 
 ## Sample CURL commands
-Following commands are used with the web server running on localhost.
+Following commands are used with the web server running on localhost. Replace with an appropriate host and port.
 
 ### Get All
 **local**  
