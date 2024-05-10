@@ -77,6 +77,18 @@ Javascript functions with jquery / ajax calls to REST server.
 ### mysqldbcfg_template.py
 The template configuration file. Copy and fill the *local_db* dict out with your host, user, password and database information if deploying locally. Ensure to save the copy as *mysqldbcfg.py*.
 
+## Python Enviroment
+Python 3.11.7 was used to develop and test this application.
+The packages that needed to be added to the anaconda environment were:  
+
+| Package   | Version | Command |
+|-------|-------------|---------|
+| mysql | 0.0.3 | pip install mysql |
+| mysqlclient | 2.2.4 | installed with mysql |
+| Flask | 3.0.3 | pip install flask |
+| Flask-Cors | 4.0.1 | pip install flask-cors | 
+  
+The full list of packages (the output of *pip list > packages.txt*) is included in the repository.  
 
 ## API Definition
 The parameters are:
