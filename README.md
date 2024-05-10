@@ -47,9 +47,9 @@ Link to the main [GitHub repository](https://github.com/dvdgeroconnell/wsaa-proj
     - If the database specified in *mysqldbcfg.py* does not exist, it will be created.
     - If the *records* table does not already exist in the database, will be created.
     - If the database is empty, it will be populated with a couple of example records.
-3. Launch the http://"hostname:port"/recordviewer.html web page.
+3. Launch the *http://"hostname:port"/recordviewer.html* web page.
     - The REST server will tell you on startup the hostname and port to use.
-    - Use the web server hosted recordviewer.html rather than one deployed in your file system, as it uses relative paths.
+    - Use the web server hosted *recordviewer.html* rather than one deployed in your file system, as it uses relative paths.
 
 ### Schema for *records* table
 
